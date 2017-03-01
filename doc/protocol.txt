@@ -1,12 +1,15 @@
 Protocol
 --------
 
+/* 同时接受TCP连接和UDP连接，端口可配置 */
 Clients of memcached communicate with server through TCP connections.
 (A UDP interface is also available; details are below under "UDP
 protocol.") A given running memcached server listens on some
 (configurable) port; clients connect to that port, send commands to
 the server, read responses, and eventually close the connection.
 
+/* 连接在使用完之后可以缓存起来，减小不必要的每次创建连接的开销。
+   因为memcached的设计决定了它可以在很大的连接数（数百，如果需要的话可以上千）下高效的工作 */
 There is no need to send any command to end the session. A client may
 just close the connection at any moment it no longer needs it. Note,
 however, that clients are encouraged to cache their connections rather
@@ -17,7 +20,12 @@ necessary) of open connections. Caching connections will eliminate the
 overhead associated with establishing a TCP connection (the overhead
 of preparing for a new connection on the server side is insignificant
 compared to this).
-
+ 
+ /* 在memcached的协议中有两种类型的数据， 文本行和非结构化
+    文本行使用于客户端和服务器之间的命令和响应
+    非结构化数据在客户端想要存储数据或者接收数据的时候使用
+    服务器会将非结构化数据看作字节流，并不会在意数据的字节序
+    数据的读取方（客户端或服务器）会从文本行中的length字段中得到字节流的长度 */
 There are two kinds of data sent in the memcache protocol: text lines
 and unstructured data.  Text lines are used for commands from clients
 and responses from servers. Unstructured data is sent when a client
