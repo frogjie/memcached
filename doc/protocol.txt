@@ -38,6 +38,10 @@ of such data (either a client or a server) will always know, from a
 preceding text line, the exact length of the data block being
 transmitted.
 
+
+/* 文本行和非结构化数据都是以\r\n终止的
+   当客户端从服务器接收数据时，必须获得数据的长度，然后使用长度判断数据什么时候结束
+   而不是以跟在数据之后的\r\n判断。 */
 Text lines are always terminated by \r\n. Unstructured data is _also_
 terminated by \r\n, even though \r, \n or any other 8-bit characters
 may also appear inside the data. Therefore, when a client retrieves
@@ -48,7 +52,9 @@ does.
 
 Keys
 ----
-
+/* memcached中的数据是使用key来标识的，key是一个全局唯一的字符串
+   目前key的长度被限制在250是字符之内
+   key中不可以包含控制字符或者空白字符 */
 Data stored by memcached is identified with the help of a key. A key
 is a text string which should uniquely identify the data for clients
 that are interested in storing and retrieving it.  Currently the
